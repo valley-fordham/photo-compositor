@@ -5,13 +5,14 @@
 
 <h1>Riot Photographer</h1>
 
+<h3 id="camera-warning">No camera available</h3>
+
 <div>
 	<video id="camera" autoplay></video>
-	<canvas id="canvas" width=640 height=480></canvas>
-	<button id="btn-capture" onclick="takePhoto()">Capture</button>
-	<button id="btn-retry" onclick="showCameraView()">Retry</button>
-	
-	<img id="img-riot" src="images/Riot.png" alt="">
+	<canvas id="canvas" width=480 height=640></canvas>
+	<button id="btn-capture" class="big-button" onclick="takePhoto()">Capture</button>
+	<button id="btn-retry" class="big-button" onclick="showCameraView()">Retry</button>
+	<img id="img-riot" src="images/Riot-Composite.png" alt="">
 </div>
 
 <script src="js/photo-compositor.js"></script>
