@@ -20,7 +20,7 @@ body, html {
 
 .vertical-spacer {
 	display: block;
-	height: 20px;
+	height: 30px;
 }
 
 .text {
@@ -36,6 +36,7 @@ body, html {
 }
 
 .photoView {
+	margin-top: 100px;
 	margin-left: auto;
 	margin-right: auto;
 }
