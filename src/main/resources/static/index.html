@@ -3,16 +3,45 @@
 	<link rel="stylesheet" href="css/photo-compositor.css">
 </head>
 
-<h1>Riot Photographer</h1>
+<div class="background">
 
-<h3 id="camera-warning">No camera available</h3>
+	<div class="vertical-spacer"></div>
 
-<div>
-	<video id="camera" autoplay></video>
-	<canvas id="canvas" width=480 height=640></canvas>
-	<button id="btn-capture" class="big-button" onclick="takePhoto()">Capture</button>
-	<button id="btn-retry" class="big-button" onclick="showCameraView()">Retry</button>
-	<img id="img-riot" src="images/Riot-Composite.png" alt="">
+	<div class="header">
+		<div>
+			<img id="img-title" src="images/title.png" alt="">
+		</div>
+	</div>
+	
+	<div class="vertical-spacer"></div>
+	
+	<div id="camera-not-supported" class="text noDisplayOnLoad">
+		No camera available.
+	</div>
+
+	<div id="camera-no-permission" class="text noDisplayOnLoad">
+		Camera not permitted.
+	</div>
+
+	<div class="vertical-spacer"></div>
+	
+	<video id="camera" class="noDisplayOnLoad photoView" autoplay></video>
+	
+	<canvas id="canvas" class="noDisplayOnLoad photoView" width=480 height=640></canvas>
+
+	<div class="vertical-spacer"></div>
+	
+	<button id="btn-capture" class="noDisplayOnLoad big-button" onclick="takePhoto()">Capture</button>
+	
+	<button id="btn-retry" class="noDisplayOnLoad big-button" onclick="showCameraView()">Retry</button>
+
+	<button id="btn-download" class="noDisplayOnLoad big-button" onclick="downloadPhoto()">Download</button>
+	
+	<img id="img-riot" class="noDisplayOnLoad" src="images/riot-composite.png" alt="">
+
+	<img id="img-riot-background" src="images/riot-composite.png" alt="">
+	<div class="copyright-notice">Copyright© 2021 Thread Assessment Corporation.</div>
 </div>
 
 <script src="js/photo-compositor.js"></script>
+<script src="js/FileSaver.min.js"></script>

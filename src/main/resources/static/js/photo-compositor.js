@@ -6,14 +6,16 @@ const context = photoCanvas.getContext('2d');
 const imgRiot = document.getElementById('img-riot');
 const btnCapture = document.getElementById('btn-capture');
 const btnRetry = document.getElementById('btn-retry');
-const cameraWarning = document.getElementById('camera-warning');
+const btnDownload = document.getElementById('btn-download');
+const cameraNotSupported = document.getElementById('camera-not-supported');
+const cameraNoPermission = document.getElementById('camera-no-permission');
 let cameraX = 0;
 let cameraY = 0;
 
 if (supported) {
 	showCameraView();
 } else {
-	cameraWarning.style.display = "block";
+	cameraNotSupported.style.display = "block";
 }
 
 function takePhoto()  {
@@ -24,20 +26,24 @@ function takePhoto()  {
 
 function hideCameraView() {
 	// this is broken in current version of Chrome, may be able to bring it back later
-	// cameraView.srcObject.getVideoTracks().forEach(track => track.stop());
+	if (!(/Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor))) {
+		cameraView.srcObject.getVideoTracks().forEach(track => track.stop());
+	}
 	cameraView.style.display = "none";
 	photoCanvas.style.display = "block";
 	btnCapture.style.display = "none";
 	btnRetry.style.display = "block";
+	btnDownload.style.display = "block";
 }
 
 function showCameraView() {
 	photoCanvas.style.display = "none";
-	cameraView.style.display = "block";
 	btnRetry.style.display = "none";
+	btnDownload.style.display = "none";
 	
 	const constraints = {
 		video: true,
+		audio: false
 	};
 	
 	// Attach the video stream to the video element and autoplay.
@@ -46,10 +52,15 @@ function showCameraView() {
 			cameraView.srcObject = stream;
 			cameraX = stream.getVideoTracks()[0].getSettings().width;
 			cameraY = stream.getVideoTracks()[0].getSettings().height;
-			console.log(cameraX);
-			console.log(cameraY);
-			document.getElementById('btn-capture').style.display = "block";
+			cameraView.style.display = "block";
+			btnCapture.style.display = "block";
 		}).catch(function() {
-			cameraWarning.style.display = "block";
+			cameraNoPermission.style.display = "block";
+	});
+}
+
+function downloadPhoto(){
+	photoCanvas.toBlob(function(blob) {
+		saveAs(blob, "riot-" + new Date() + ".png");
 	});
 }
