@@ -75,11 +75,11 @@ body, html {
 
 @font-face {
 	font-family: Futurama;
-	src: url("/css/fonts/fr-bold.ttf");
+	src: url("fonts/fr-bold.ttf");
 	font-weight: bold;
 }
 
 @font-face {
 	font-family: FuturamaAlien;
-	src: url("/css/fonts/fr-fal1.ttf");
+	src: url("fonts/fr-fal1.ttf");
 }
