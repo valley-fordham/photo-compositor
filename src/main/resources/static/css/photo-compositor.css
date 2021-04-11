@@ -1,6 +1,8 @@
 body, html {
 	height: 100%;
 	margin: 0;
+	overflow-x: hidden;
+	overflow-y: hidden;
 }
 
 .background {
@@ -69,9 +71,24 @@ body, html {
 	vertical-align: middle;
 }
 
-@media only screen and (max-height: 1280px) {
+@media screen and (max-height: 1600px) {
 	.big-button {
-		font-size: 60px;
+		font-size: 56px;
+	}
+	#img-title {
+		display: none;
+	}
+}
+
+@media screen and (max-height: 1280px) {
+	.big-button {
+		font-size: 50px;
+	}
+}
+
+@media screen and (max-height: 720px) {
+	.big-button {
+		font-size: 40px;
 	}
 }
 
