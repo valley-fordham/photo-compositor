@@ -41,6 +41,10 @@ body, html {
 	display: none;
 }
 
+#camera, #canvas {
+	border: solid black 20px;
+}
+
 .photoView {
 	margin-top: 80px;
 	margin-left: auto;
@@ -66,7 +70,22 @@ body, html {
 	vertical-align: middle;
 }
 
-#img-riot-background {
+.overlay-button {
+	width: 82px;
+	height: 150px;
+	background: url(/images/bender.png);
+	background-size: contain;
+	border: none;
+	margin-left: auto;
+	margin-right: 100px;
+}
+
+#img-speech-bubble {
+	margin-left: auto;
+	margin-right: 130px;
+}
+
+#img-background {
 	position: fixed;
 	bottom: 0;
 	left: 25%;
@@ -83,11 +102,11 @@ body, html {
 
 @font-face {
 	font-family: Futurama;
-	src: url("fonts/fr-bold.ttf");
+	src: url(fonts/fr-bold.ttf);
 	font-weight: bold;
 }
 
 @font-face {
 	font-family: FuturamaAlien;
-	src: url("fonts/fr-fal1.ttf");
+	src: url(fonts/fr-fal1.ttf);
 }
