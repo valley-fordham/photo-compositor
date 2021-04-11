@@ -11,6 +11,7 @@ const btnChangeOverlay = document.getElementById('btn-change-overlay');
 const imgSpeechBubble = document.getElementById('img-speech-bubble');
 const btnRetry = document.getElementById('btn-retry');
 const btnDownload = document.getElementById('btn-download');
+const btnUpload = document.getElementById('btn-upload');
 const txtCameraNotSupported = document.getElementById('camera-not-supported');
 const txtCameraNoPermission = document.getElementById('camera-no-permission');
 const txtLandscapeNotSupported = document.getElementById('landscape-not-supported');
@@ -45,6 +46,7 @@ function checkOrientation() {
 		btnCapture.style.display = "none";
 		btnDownload.style.display = "none";
 		btnRetry.style.display = "none";
+		btnUpload.style.display = "none";
 		btnChangeOverlay.style.display = "none";
 		imgSpeechBubble.style.display = "none";
 		txtLandscapeNotSupported.style.display = "block";
@@ -53,6 +55,7 @@ function checkOrientation() {
 			photoCanvas.style.display = "block";
 			btnDownload.style.display = "block";
 			btnRetry.style.display = "block";
+			btnUpload.style.display = "block";
 		} else {
 			cameraView.style.display = "block";
 			btnCapture.style.display = "block";
@@ -63,7 +66,7 @@ function checkOrientation() {
 	}
 }
 
-function takePhoto()  {	
+function takePhoto()  {
 	context.drawImage(cameraView, 0, 0, photoCanvas.width, photoCanvas.height);
 	drawCompositeOverlay();
 	context.drawImage(photoTitle, 0, 20, photoTitle.width, photoTitle.height);
@@ -83,6 +86,7 @@ function hideCameraView() {
 	imgSpeechBubble.style.display = "none";
 	btnRetry.style.display = "block";
 	btnDownload.style.display = "block";
+	btnUpload.style.display = "block";
 	isPhotoDisplayed = true;
 }
 
@@ -91,13 +95,14 @@ function showCameraView() {
 	photoCanvas.style.display = "none";
 	btnRetry.style.display = "none";
 	btnDownload.style.display = "none";
+	btnUpload.style.display = "none";
 	imgBackground.style.display = "block";
-	
+
 	const constraints = {
 		video: true,
 		audio: false
 	};
-	
+
 	// Attach the video stream to the video element and autoplay.
 	navigator.mediaDevices.getUserMedia(constraints)
 		.then((stream) => {
@@ -108,6 +113,7 @@ function showCameraView() {
 			btnCapture.style.display = "block";
 			btnChangeOverlay.style.display = "block";
 			imgSpeechBubble.style.display = "block";
+			btnUpload.disabled = false;
 			checkOrientation();
 		}).catch(function() {
 			txtCameraNoPermission.style.display = "block";
@@ -151,4 +157,20 @@ function drawCompositeOverlay() {
 		case OVERLAY.headless:
 			context.drawImage(imgHeadless, 0, 240, imgHeadless.width, imgHeadless.height);
 	}
+}
+
+function uploadCompositePhoto() {
+	btnUpload.style.display = "none";
+	const xhr = new XMLHttpRequest();
+	photoCanvas.toBlob(function(imageBlob) {
+		xhr.open('POST', "api/v1/saveimage", false);
+		xhr.setRequestHeader("Content-Type", "image/png");
+		xhr.send(imageBlob);
+		if (xhr.status === 200) {
+			alert("Successfully uploaded photo!");
+		} else {
+			alert("Upload failed :(");
+			console.log("Error uploading image:" + xhr.responseText);
+		}
+	})
 }
