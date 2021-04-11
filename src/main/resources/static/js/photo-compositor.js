@@ -113,7 +113,6 @@ function showCameraView() {
 			btnCapture.style.display = "block";
 			btnChangeOverlay.style.display = "block";
 			imgSpeechBubble.style.display = "block";
-			btnUpload.disabled = false;
 			checkOrientation();
 		}).catch(function() {
 			txtCameraNoPermission.style.display = "block";

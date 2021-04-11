@@ -46,7 +46,6 @@ body, html {
 }
 
 .photoView {
-	margin-top: 80px;
 	margin-left: auto;
 	margin-right: auto;
 }
@@ -70,19 +69,27 @@ body, html {
 	vertical-align: middle;
 }
 
+@media only screen and (max-height: 1280px) {
+	.big-button {
+		font-size: 60px;
+	}
+}
+
 .overlay-button {
 	width: 82px;
 	height: 150px;
 	background: url(../images/bender.png);
 	background-size: contain;
 	border: none;
-	margin-left: auto;
-	margin-right: 100px;
+	position: absolute;
+	bottom: 300px;
+	right: 100px;
 }
 
 #img-speech-bubble {
-	margin-left: auto;
-	margin-right: 130px;
+	position: absolute;
+	bottom: 150px;
+	right: 150px;
 }
 
 #img-background {
