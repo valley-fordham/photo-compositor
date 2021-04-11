@@ -170,6 +170,7 @@ function uploadCompositePhoto() {
 		} else {
 			alert("Upload failed :(");
 			console.log("Error uploading image:" + xhr.responseText);
+			btnUpload.style.display = "block";
 		}
 	})
 }
