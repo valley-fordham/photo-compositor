@@ -75,15 +75,6 @@ body, html {
 	.big-button {
 		font-size: 56px;
 	}
-	#img-title {
-		display: none;
-	}
-}
-
-@media screen and (max-height: 1280px) {
-	.big-button {
-		font-size: 50px;
-	}
 }
 
 @media screen and (max-height: 720px) {
@@ -105,7 +96,7 @@ body, html {
 
 #img-speech-bubble {
 	position: absolute;
-	bottom: 150px;
+	bottom: 170px;
 	right: 150px;
 }
 
