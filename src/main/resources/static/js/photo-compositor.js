@@ -39,7 +39,8 @@ window.addEventListener("orientationchange", function() {
 }, false);
 
 function checkOrientation() {
-	if (window.orientation === 90) {
+	// Check for both left and right tilt
+	if (Math.abs(window.orientation) === 90) {
 		cameraView.style.display = "none";
 		btnCapture.style.display = "none";
 		photoCanvas.style.display = "none";
