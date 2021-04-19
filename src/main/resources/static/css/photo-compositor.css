@@ -83,13 +83,33 @@ body, html {
 	}
 }
 
-.overlay-button {
-	width: 82px;
-	height: 150px;
-	background: url(../images/bender.png);
+.futurama-icon {
+	width: 128px;
+	height: 128px;
+}
+
+.toggle-button {
 	background-size: contain;
 	border: none;
 	position: absolute;
+}
+
+.toggle-camera-button {
+
+	bottom: 300px;
+	left: 100px;
+ }
+
+.toggle-camera-button-faceleft {
+	background: url(../images/professor-left.png);
+}
+
+.toggle-camera-button-faceright {
+	background: url(../images/professor-right.png);
+}
+
+.overlay-button {
+	background: url(../images/bender.png);
 	bottom: 300px;
 	right: 100px;
 }
@@ -97,7 +117,7 @@ body, html {
 #img-speech-bubble {
 	position: absolute;
 	bottom: 170px;
-	right: 150px;
+	right: 170px;
 }
 
 #img-background {

@@ -1,4 +1,6 @@
-const supported = 'mediaDevices' in navigator;
+'use strict';
+
+const supported = 'mediaDevices' in navigator && 'getUserMedia' in navigator.mediaDevices;
 
 const cameraView = document.getElementById('camera');
 const photoCanvas = document.getElementById('canvas');
@@ -9,6 +11,7 @@ const photoTitle = document.getElementById('img-photo-title');
 const btnCapture = document.getElementById('btn-capture');
 const btnChangeOverlay = document.getElementById('btn-change-overlay');
 const imgSpeechBubble = document.getElementById('img-speech-bubble');
+const btnToggleCamera = document.getElementById('btn-toggle-camera');
 const btnRetry = document.getElementById('btn-retry');
 const btnDownload = document.getElementById('btn-download');
 const btnUpload = document.getElementById('btn-upload');
@@ -21,6 +24,7 @@ const OVERLAY = Object.freeze({"futurama": 0, "headless": 1});
 
 let isPhotoDisplayed = false;
 let currentOverlay = OVERLAY.futurama;
+let selfieCam = true;
 let cameraX = 0;
 let cameraY = 0;
 
@@ -29,6 +33,7 @@ let cameraY = 0;
 if (supported) {
 	showCameraView();
 } else {
+	console.error('Camera not supported');
 	txtCameraNotSupported.style.display = "block";
 }
 setOverlay(OVERLAY.futurama);
@@ -49,6 +54,7 @@ function checkOrientation() {
 		btnRetry.style.display = "none";
 		btnUpload.style.display = "none";
 		btnChangeOverlay.style.display = "none";
+		btnToggleCamera.style.display = "none";
 		imgSpeechBubble.style.display = "none";
 		txtLandscapeNotSupported.style.display = "block";
 	} else if (supported) {
@@ -61,6 +67,7 @@ function checkOrientation() {
 			cameraView.style.display = "block";
 			btnCapture.style.display = "block";
 			btnChangeOverlay.style.display = "block";
+			btnToggleCamera.style.display = "block";
 			imgSpeechBubble.style.display = "block";
 		}
 		txtLandscapeNotSupported.style.display = "none";
@@ -77,12 +84,13 @@ function takePhoto()  {
 function hideCameraView() {
 	// this is broken in current version of Chrome, may be able to bring it back later
 	if (!(/Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor))) {
-		cameraView.srcObject.getVideoTracks().forEach(track => track.stop());
+		stopCameraStream();
 	}
 	cameraView.style.display = "none";
 	imgBackground.style.display = "none";
 	photoCanvas.style.display = "block";
 	btnCapture.style.display = "none";
+	btnToggleCamera.style.display = "none";
 	btnChangeOverlay.style.display = "none";
 	imgSpeechBubble.style.display = "none";
 	btnRetry.style.display = "block";
@@ -98,11 +106,23 @@ function showCameraView() {
 	btnDownload.style.display = "none";
 	btnUpload.style.display = "none";
 	imgBackground.style.display = "block";
+	let constraints;
 
-	const constraints = {
-		video: true,
-		audio: false
-	};
+	if (selfieCam) {
+		constraints = {
+			video: {
+				facingMode: "environment",
+			},
+			audio: false
+		};
+	} else {
+		constraints = {
+			video: {
+				facingMode: "user",
+			},
+			audio: false
+		};
+	}
 
 	// Attach the video stream to the video element and autoplay.
 	navigator.mediaDevices.getUserMedia(constraints)
@@ -115,7 +135,8 @@ function showCameraView() {
 			btnChangeOverlay.style.display = "block";
 			imgSpeechBubble.style.display = "block";
 			checkOrientation();
-		}).catch(function() {
+		}).catch(function(e) {
+			console.error('An error occurred trying to use camera stream', e);
 			txtCameraNoPermission.style.display = "block";
 			btnCapture.style.display = "none";
 	});
@@ -125,6 +146,24 @@ function downloadPhoto(){
 	photoCanvas.toBlob(function(blob) {
 		saveAs(blob, "riot-" + new Date() + ".png");
 	});
+}
+
+function stopCameraStream() {
+	cameraView.srcObject.getVideoTracks().forEach(track => track.stop());
+}
+
+function toggleSelfieCam() {
+	selfieCam = !selfieCam;
+	if (selfieCam) {
+		btnToggleCamera.classList.remove("toggle-camera-button-faceleft");
+		btnToggleCamera.classList.add("toggle-camera-button-faceright");
+	} else {
+		btnToggleCamera.classList.add("toggle-camera-button-faceleft");
+		btnToggleCamera.classList.remove("toggle-camera-button-faceright");
+	}
+	hideCameraView();
+	stopCameraStream();
+	showCameraView()
 }
 
 function changeOverlay() {
