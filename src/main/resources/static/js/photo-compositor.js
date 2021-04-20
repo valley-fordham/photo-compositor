@@ -1,87 +1,69 @@
 'use strict';
 
-const supported = 'mediaDevices' in navigator && 'getUserMedia' in navigator.mediaDevices;
+const noDisplayOnErrorElements = document.getElementsByClassName('noDisplayOnError');
+const cameraViewElements = document.getElementsByClassName('cameraView');
+const photoViewElements = document.getElementsByClassName('photoView');
 
 const cameraView = document.getElementById('camera');
 const photoCanvas = document.getElementById('canvas');
-const context = photoCanvas.getContext('2d');
-const imgFuturama = document.getElementById('img-futurama');
-const imgHeadless = document.getElementById('img-headless');
-const photoTitle = document.getElementById('img-photo-title');
-const btnCapture = document.getElementById('btn-capture');
-const btnChangeOverlay = document.getElementById('btn-change-overlay');
-const imgSpeechBubble = document.getElementById('img-speech-bubble');
-const btnToggleCamera = document.getElementById('btn-toggle-camera');
-const btnRetry = document.getElementById('btn-retry');
-const btnDownload = document.getElementById('btn-download');
-const btnUpload = document.getElementById('btn-upload');
-const txtCameraNotSupported = document.getElementById('camera-not-supported');
-const txtCameraNoPermission = document.getElementById('camera-no-permission');
-const txtLandscapeNotSupported = document.getElementById('landscape-not-supported');
-const imgBackground = document.getElementById('img-background');
 
 const OVERLAY = Object.freeze({"futurama": 0, "headless": 1});
 
+const cameraIsSupported = 'mediaDevices' in navigator && 'getUserMedia' in navigator.mediaDevices;
 let isPhotoDisplayed = false;
 let currentOverlay = OVERLAY.futurama;
 let selfieCam = true;
 let cameraX = 0;
 let cameraY = 0;
-
+let haveWarnedUserAboutChromeBug = false;
 
 // Initialise screen
-if (supported) {
+if (cameraIsSupported) {
 	showCameraView();
 } else {
 	console.error('Camera not supported');
-	showElements(txtCameraNotSupported);
+	showElements(document.getElementById('camera-not-supported'));
+	setVisibilityForElements(noDisplayOnErrorElements, false);
 }
 setOverlay(OVERLAY.futurama);
-
 
 window.addEventListener("orientationchange", function() {
 	checkOrientation();
 }, false);
 
 function checkOrientation() {
+	const txtLandscapeNotSupported = document.getElementById('landscape-not-supported');
 	// Check for both left and right tilt
 	if (Math.abs(window.orientation) === 90) {
-		hideElements(cameraView, btnCapture, photoCanvas, btnCapture, btnDownload, btnRetry, btnUpload,
-			btnChangeOverlay, btnToggleCamera, imgSpeechBubble);
+		setVisibilityForElements(noDisplayOnErrorElements, false);
 		showElements(txtLandscapeNotSupported);
-	} else if (supported) {
+	} else if (cameraIsSupported) {
 		if (isPhotoDisplayed) {
-			showElements(photoCanvas, btnDownload, btnRetry, btnUpload);
+			setVisibilityForElements(photoViewElements, true);
 		} else {
-			showElements(cameraView, btnCapture, btnChangeOverlay, btnToggleCamera, imgSpeechBubble);
+			setVisibilityForElements(cameraViewElements, true);
 		}
 		hideElements(txtLandscapeNotSupported);
 	}
 }
 
 function takePhoto()  {
-	context.drawImage(cameraView, 0, 0, photoCanvas.width, photoCanvas.height);
 	drawCompositeOverlay();
-	context.drawImage(photoTitle, 0, 20, photoTitle.width, photoTitle.height);
 	hideCameraView();
 }
 
 function hideCameraView() {
-	// this is broken in current version of Chrome, may be able to bring it back later
-	if (!(/Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor))) {
-		stopCameraStream();
-	}
-	hideElements(cameraView, imgBackground, btnCapture, btnToggleCamera, btnChangeOverlay, imgSpeechBubble)
-	showElements(photoCanvas, btnRetry, btnDownload, btnUpload);
+	stopCameraStream();
+	setVisibilityForElements(cameraViewElements, false);
+	setVisibilityForElements(photoViewElements, true);
 	isPhotoDisplayed = true;
 }
 
 function showCameraView() {
 	isPhotoDisplayed = false;
-	hideElements(photoCanvas, btnRetry, btnDownload, btnUpload);
-	showElements(imgBackground);
+	setVisibilityForElements(photoViewElements, false);
+	setVisibilityForElements(cameraViewElements, true);
 	startCameraStream();
-	showElements(cameraView, btnCapture, btnChangeOverlay, imgSpeechBubble);
 }
 
 function downloadPhoto(){
@@ -91,24 +73,20 @@ function downloadPhoto(){
 }
 
 function startCameraStream() {
+	const txtCameraNoPermission = document.getElementById('camera-no-permission');
 	hideElements(txtCameraNoPermission);
 
-	let constraints;
+	// JS doesn't like using ternary to assign facingMode
+	let cameraType = "environment";
 	if (selfieCam) {
-		constraints = {
-			video: {
-				facingMode: "user",
-			},
-			audio: false
-		};
-	} else {
-		constraints = {
-			video: {
-				facingMode: "environment",
-			},
-			audio: false
-		};
+		cameraType = "user";
 	}
+	const constraints = {
+		video: {
+			facingMode: cameraType,
+		},
+		audio: false
+	};
 
 	// Attach the video stream to the video element and autoplay.
 	navigator.mediaDevices.getUserMedia(constraints)
@@ -120,15 +98,22 @@ function startCameraStream() {
 		}).catch(function(e) {
 			console.error('An error occurred trying to use camera stream', e);
 			showElements(txtCameraNoPermission);
-			hideElements(btnCapture);
+			setVisibilityForElements(noDisplayOnErrorElements, false);
+			haveWarnedUserAboutChromeBug = true;
+			stopCameraStream();
 		});
 }
 
 function stopCameraStream() {
+	if (isBrowserChrome() && !haveWarnedUserAboutChromeBug) {
+		haveWarnedUserAboutChromeBug = true;
+		alert("If Chrome appears to freeze at anytime, just minimise and reopen Chrome :)")
+	}
 	cameraView.srcObject.getVideoTracks().forEach(track => track.stop());
 }
 
 function toggleSelfieCam() {
+	const btnToggleCamera = document.getElementById('btn-toggle-camera');
 	selfieCam = !selfieCam;
 	if (selfieCam) {
 		btnToggleCamera.classList.remove("toggle-camera-button-faceleft");
@@ -138,7 +123,9 @@ function toggleSelfieCam() {
 		btnToggleCamera.classList.remove("toggle-camera-button-faceright");
 	}
 	stopCameraStream();
-	startCameraStream();
+	setTimeout(function() {
+		startCameraStream();
+	}, 500)
 }
 
 function changeOverlay() {
@@ -151,6 +138,7 @@ function changeOverlay() {
 }
 
 function setOverlay(overlay) {
+	const imgBackground = document.getElementById('img-background');
 	switch (overlay) {
 		case OVERLAY.futurama:
 			imgBackground.src="images/composite-futurama.png";
@@ -164,16 +152,22 @@ function setOverlay(overlay) {
 }
 
 function drawCompositeOverlay() {
+	photoCanvas.getContext('2d').drawImage(cameraView, 0, 0, photoCanvas.width, photoCanvas.height);
 	switch (currentOverlay) {
 		case OVERLAY.futurama:
-			context.drawImage(imgFuturama, 0, 400, imgFuturama.width, imgFuturama.height);
+			const imgFuturama = document.getElementById('img-futurama');
+			photoCanvas.getContext('2d').drawImage(imgFuturama, 0, 400, imgFuturama.width, imgFuturama.height);
 			break;
 		case OVERLAY.headless:
-			context.drawImage(imgHeadless, 0, 240, imgHeadless.width, imgHeadless.height);
+			const imgHeadless = document.getElementById('img-headless');
+			photoCanvas.getContext('2d').drawImage(imgHeadless, 0, 240, imgHeadless.width, imgHeadless.height);
 	}
+	const photoTitle = document.getElementById('img-photo-title');
+	photoCanvas.getContext('2d').drawImage(photoTitle, 0, 20, photoTitle.width, photoTitle.height);
 }
 
 function uploadCompositePhoto() {
+	const btnUpload = document.getElementById('btn-upload');
 	hideElements(btnUpload);
 	const xhr = new XMLHttpRequest();
 	photoCanvas.toBlob(function(imageBlob) {
@@ -199,5 +193,15 @@ function hideElements(/**/) {
 function showElements(/**/) {
 	for (let i = 0; i < arguments.length; i++) {
 		arguments[i].style.display = "block";
+	}
+}
+
+function isBrowserChrome() {
+	return /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
+}
+
+function setVisibilityForElements(elements, visible) {
+	for (let i = 0; i < elements.length; i++) {
+		elements[i].style.display = (visible ? "block" : "none");
 	}
 }

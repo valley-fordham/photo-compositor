@@ -44,12 +44,9 @@ body, html {
 }
 
 #camera, #canvas {
-	border: solid black 20px;
-}
-
-.photoView {
 	margin-left: auto;
 	margin-right: auto;
+	border: solid black 20px;
 }
 
 .big-button {

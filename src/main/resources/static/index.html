@@ -34,28 +34,29 @@
 
 	<div class="vertical-spacer"></div>
 
-	<video id="camera" class="noDisplayOnLoad photoView" width="480" height="640" autoplay preload="metadata" playsInline muted></video>
+	<video id="camera" class="noDisplayOnLoad cameraView noDisplayOnError" width="480" height="640" autoplay preload="metadata" playsInline muted></video>
 
-	<canvas id="canvas" class="noDisplayOnLoad photoView" width=480 height=640></canvas>
+	<canvas id="canvas" class="noDisplayOnLoad photoView noDisplayOnError" width=480 height=640></canvas>
 
 	<div class="vertical-spacer"></div>
 
-	<button id="btn-capture" class="noDisplayOnLoad big-button" onclick="takePhoto()">Capture</button>
-	<button id="btn-retry" class="noDisplayOnLoad big-button" onclick="showCameraView()">Retry</button>
-	<button id="btn-download" class="noDisplayOnLoad big-button" onclick="downloadPhoto()">Download</button>
-	<button id="btn-upload" class="noDisplayOnLoad big-button" onclick="uploadCompositePhoto()">Upload</button>
+	<button id="btn-capture" class="noDisplayOnLoad noDisplayOnError cameraView big-button" onclick="takePhoto()">Capture</button>
 
-	<button id="btn-toggle-camera" class="noDisplayOnLoad futurama-icon toggle-button toggle-camera-button toggle-camera-button-faceright" onclick="toggleSelfieCam()"></button>
-	<div id="toggle-camera-label">Switch Cam</div>
+	<button id="btn-retry" class="noDisplayOnLoad noDisplayOnError photoView big-button" onclick="showCameraView()">Retry</button>
+	<button id="btn-download" class="noDisplayOnLoad noDisplayOnError photoView big-button" onclick="downloadPhoto()">Download</button>
+	<button id="btn-upload" class="noDisplayOnLoad noDisplayOnError photoView big-button" onclick="uploadCompositePhoto()">Upload</button>
 
-	<button id="btn-change-overlay" class="noDisplayOnLoad futurama-icon toggle-button overlay-button" onclick="changeOverlay()"></button>
-	<img id="img-speech-bubble" class="noDisplayOnLoad" src="images/speech-bubble.png" alt="">
+	<button id="btn-toggle-camera" class="noDisplayOnLoad noDisplayOnError cameraView futurama-icon toggle-button toggle-camera-button toggle-camera-button-faceright" onclick="toggleSelfieCam()"></button>
+	<div id="toggle-camera-label" class="noDisplayOnLoad noDisplayOnError cameraView">Switch Cam</div>
+
+	<button id="btn-change-overlay" class="noDisplayOnLoad noDisplayOnError cameraView futurama-icon toggle-button overlay-button" onclick="changeOverlay()"></button>
+	<img id="img-speech-bubble" class="noDisplayOnLoad noDisplayOnError cameraView" src="images/speech-bubble.png" alt="">
 
 	<img id="img-futurama" class="noDisplayOnLoad" src="images/composite-futurama.png" alt="">
 	<img id="img-headless" class="noDisplayOnLoad" src="images/composite-headless.png" alt="">
 	<img id="img-photo-title" class="noDisplayOnLoad" src="images/composite-title.png" alt="">
 
-	<img id="img-background" src="" alt="">
+	<img id="img-background" class="cameraView" src="" alt="">
 	<div class="copyright-notice">Copyright© 2021 Thread Assessment Corporation.</div>
 </div>
 
