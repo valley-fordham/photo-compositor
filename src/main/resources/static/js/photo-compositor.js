@@ -6,6 +6,7 @@ const photoViewElements = document.getElementsByClassName('photoView');
 
 const cameraView = document.getElementById('camera');
 const photoCanvas = document.getElementById('canvas');
+let photoCanvasRaw;
 
 const OVERLAY = Object.freeze({"futurama": 0, "headless": 1});
 
@@ -47,7 +48,10 @@ function checkOrientation() {
 	}
 }
 
-function takePhoto()  {
+function takePhoto() {
+	photoCanvas.getContext('2d').drawImage(cameraView, 0, 0, photoCanvas.width, photoCanvas.height);
+	// Make a copy of the raw photo for upload purposes
+	photoCanvasRaw = cloneCanvas(photoCanvas);
 	drawCompositeOverlay();
 	hideCameraView();
 }
@@ -61,6 +65,7 @@ function hideCameraView() {
 
 function showCameraView() {
 	isPhotoDisplayed = false;
+	hideElements(document.getElementById('txt-upload-success'));
 	setVisibilityForElements(photoViewElements, false);
 	setVisibilityForElements(cameraViewElements, true);
 	startCameraStream();
@@ -152,7 +157,6 @@ function setOverlay(overlay) {
 }
 
 function drawCompositeOverlay() {
-	photoCanvas.getContext('2d').drawImage(cameraView, 0, 0, photoCanvas.width, photoCanvas.height);
 	switch (currentOverlay) {
 		case OVERLAY.futurama:
 			const imgFuturama = document.getElementById('img-futurama');
@@ -167,19 +171,25 @@ function drawCompositeOverlay() {
 }
 
 function uploadCompositePhoto() {
-	const btnUpload = document.getElementById('btn-upload');
-	hideElements(btnUpload);
+	hideElements(document.getElementById('btn-upload'));
+	pushToServer(photoCanvasRaw, false);
+	pushToServer(photoCanvas, true);
+}
+
+function pushToServer(canvas, displayResponse) {
 	const xhr = new XMLHttpRequest();
-	photoCanvas.toBlob(function(imageBlob) {
+	canvas.toBlob(function(imageBlob) {
 		xhr.open('POST', "api/v1/saveimage", false);
 		xhr.setRequestHeader("Content-Type", "image/png");
 		xhr.send(imageBlob);
-		if (xhr.status === 200) {
-			alert("Successfully uploaded photo!");
-		} else {
-			alert("Upload failed :(");
-			console.error("Error uploading image:" + xhr.responseText);
-			showElements(btnUpload);
+		if (displayResponse) {
+			if (xhr.status === 200) {
+				showElements(document.getElementById('txt-upload-success'));
+			} else {
+				alert("Upload failed :(");
+				console.error("Error uploading image:" + xhr.responseText);
+				showElements(document.getElementById('btn-upload'));
+			}
 		}
 	})
 }
@@ -204,4 +214,12 @@ function setVisibilityForElements(elements, visible) {
 	for (let i = 0; i < elements.length; i++) {
 		elements[i].style.display = (visible ? "block" : "none");
 	}
+}
+
+function cloneCanvas(oldCanvas) {
+	const newCanvas = document.createElement('canvas');
+	newCanvas.width = oldCanvas.width;
+	newCanvas.height = oldCanvas.height;
+	newCanvas.getContext('2d').drawImage(oldCanvas, 0, 0);
+	return newCanvas;
 }
