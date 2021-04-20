@@ -111,14 +111,14 @@ function showCameraView() {
 	if (selfieCam) {
 		constraints = {
 			video: {
-				facingMode: "environment",
+				facingMode: "user",
 			},
 			audio: false
 		};
 	} else {
 		constraints = {
 			video: {
-				facingMode: "user",
+				facingMode: "environment",
 			},
 			audio: false
 		};
