@@ -88,6 +88,14 @@ body, html {
 	height: 128px;
 }
 
+#toggle-camera-label {
+	font-family: Futurama, serif;
+	color: white;
+	position: absolute;
+	bottom: 260px;
+	left: 110px;
+}
+
 .toggle-button {
 	background-size: contain;
 	border: none;
@@ -95,10 +103,9 @@ body, html {
 }
 
 .toggle-camera-button {
-
 	bottom: 300px;
 	left: 100px;
- }
+}
 
 .toggle-camera-button-faceleft {
 	background: url(../images/professor-left.png);

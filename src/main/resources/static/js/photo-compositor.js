@@ -34,7 +34,7 @@ if (supported) {
 	showCameraView();
 } else {
 	console.error('Camera not supported');
-	txtCameraNotSupported.style.display = "block";
+	showElements(txtCameraNotSupported);
 }
 setOverlay(OVERLAY.futurama);
 
@@ -46,31 +46,16 @@ window.addEventListener("orientationchange", function() {
 function checkOrientation() {
 	// Check for both left and right tilt
 	if (Math.abs(window.orientation) === 90) {
-		cameraView.style.display = "none";
-		btnCapture.style.display = "none";
-		photoCanvas.style.display = "none";
-		btnCapture.style.display = "none";
-		btnDownload.style.display = "none";
-		btnRetry.style.display = "none";
-		btnUpload.style.display = "none";
-		btnChangeOverlay.style.display = "none";
-		btnToggleCamera.style.display = "none";
-		imgSpeechBubble.style.display = "none";
-		txtLandscapeNotSupported.style.display = "block";
+		hideElements(cameraView, btnCapture, photoCanvas, btnCapture, btnDownload, btnRetry, btnUpload,
+			btnChangeOverlay, btnToggleCamera, imgSpeechBubble);
+		showElements(txtLandscapeNotSupported);
 	} else if (supported) {
 		if (isPhotoDisplayed) {
-			photoCanvas.style.display = "block";
-			btnDownload.style.display = "block";
-			btnRetry.style.display = "block";
-			btnUpload.style.display = "block";
+			showElements(photoCanvas, btnDownload, btnRetry, btnUpload);
 		} else {
-			cameraView.style.display = "block";
-			btnCapture.style.display = "block";
-			btnChangeOverlay.style.display = "block";
-			btnToggleCamera.style.display = "block";
-			imgSpeechBubble.style.display = "block";
+			showElements(cameraView, btnCapture, btnChangeOverlay, btnToggleCamera, imgSpeechBubble);
 		}
-		txtLandscapeNotSupported.style.display = "none";
+		hideElements(txtLandscapeNotSupported);
 	}
 }
 
@@ -86,28 +71,29 @@ function hideCameraView() {
 	if (!(/Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor))) {
 		stopCameraStream();
 	}
-	cameraView.style.display = "none";
-	imgBackground.style.display = "none";
-	photoCanvas.style.display = "block";
-	btnCapture.style.display = "none";
-	btnToggleCamera.style.display = "none";
-	btnChangeOverlay.style.display = "none";
-	imgSpeechBubble.style.display = "none";
-	btnRetry.style.display = "block";
-	btnDownload.style.display = "block";
-	btnUpload.style.display = "block";
+	hideElements(cameraView, imgBackground, btnCapture, btnToggleCamera, btnChangeOverlay, imgSpeechBubble)
+	showElements(photoCanvas, btnRetry, btnDownload, btnUpload);
 	isPhotoDisplayed = true;
 }
 
 function showCameraView() {
 	isPhotoDisplayed = false;
-	photoCanvas.style.display = "none";
-	btnRetry.style.display = "none";
-	btnDownload.style.display = "none";
-	btnUpload.style.display = "none";
-	imgBackground.style.display = "block";
-	let constraints;
+	hideElements(photoCanvas, btnRetry, btnDownload, btnUpload);
+	showElements(imgBackground);
+	startCameraStream();
+	showElements(cameraView, btnCapture, btnChangeOverlay, imgSpeechBubble);
+}
 
+function downloadPhoto(){
+	photoCanvas.toBlob(function(blob) {
+		saveAs(blob, "riot-" + new Date() + ".png");
+	});
+}
+
+function startCameraStream() {
+	hideElements(txtCameraNoPermission);
+
+	let constraints;
 	if (selfieCam) {
 		constraints = {
 			video: {
@@ -130,22 +116,12 @@ function showCameraView() {
 			cameraView.srcObject = stream;
 			cameraX = stream.getVideoTracks()[0].getSettings().width;
 			cameraY = stream.getVideoTracks()[0].getSettings().height;
-			cameraView.style.display = "block";
-			btnCapture.style.display = "block";
-			btnChangeOverlay.style.display = "block";
-			imgSpeechBubble.style.display = "block";
 			checkOrientation();
 		}).catch(function(e) {
 			console.error('An error occurred trying to use camera stream', e);
-			txtCameraNoPermission.style.display = "block";
-			btnCapture.style.display = "none";
-	});
-}
-
-function downloadPhoto(){
-	photoCanvas.toBlob(function(blob) {
-		saveAs(blob, "riot-" + new Date() + ".png");
-	});
+			showElements(txtCameraNoPermission);
+			hideElements(btnCapture);
+		});
 }
 
 function stopCameraStream() {
@@ -161,9 +137,8 @@ function toggleSelfieCam() {
 		btnToggleCamera.classList.add("toggle-camera-button-faceleft");
 		btnToggleCamera.classList.remove("toggle-camera-button-faceright");
 	}
-	hideCameraView();
 	stopCameraStream();
-	showCameraView()
+	startCameraStream();
 }
 
 function changeOverlay() {
@@ -184,7 +159,7 @@ function setOverlay(overlay) {
 			imgBackground.src="images/composite-headless.png";
 			break;
 		default:
-			console.log('unsupported overlay');
+			console.error('unsupported overlay');
 	}
 }
 
@@ -199,7 +174,7 @@ function drawCompositeOverlay() {
 }
 
 function uploadCompositePhoto() {
-	btnUpload.style.display = "none";
+	hideElements(btnUpload);
 	const xhr = new XMLHttpRequest();
 	photoCanvas.toBlob(function(imageBlob) {
 		xhr.open('POST', "api/v1/saveimage", false);
@@ -209,8 +184,20 @@ function uploadCompositePhoto() {
 			alert("Successfully uploaded photo!");
 		} else {
 			alert("Upload failed :(");
-			console.log("Error uploading image:" + xhr.responseText);
-			btnUpload.style.display = "block";
+			console.error("Error uploading image:" + xhr.responseText);
+			showElements(btnUpload);
 		}
 	})
+}
+
+function hideElements(/**/) {
+	for (let i = 0; i < arguments.length; i++) {
+		arguments[i].style.display = "none";
+	}
+}
+
+function showElements(/**/) {
+	for (let i = 0; i < arguments.length; i++) {
+		arguments[i].style.display = "block";
+	}
 }

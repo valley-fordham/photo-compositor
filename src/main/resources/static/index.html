@@ -34,7 +34,7 @@
 
 	<div class="vertical-spacer"></div>
 
-	<video id="camera" class="noDisplayOnLoad photoView" autoplay preload="metadata" playsInline muted></video>
+	<video id="camera" class="noDisplayOnLoad photoView" width="480" height="640" autoplay preload="metadata" playsInline muted></video>
 
 	<canvas id="canvas" class="noDisplayOnLoad photoView" width=480 height=640></canvas>
 
@@ -45,7 +45,8 @@
 	<button id="btn-download" class="noDisplayOnLoad big-button" onclick="downloadPhoto()">Download</button>
 	<button id="btn-upload" class="noDisplayOnLoad big-button" onclick="uploadCompositePhoto()">Upload</button>
 
-	<button id="btn-toggle-camera" class="noDisplayOnLoad futurama-icon toggle-button toggle-camera-button toggle-camera-button-faceleft" onclick="toggleSelfieCam()"></button>
+	<button id="btn-toggle-camera" class="noDisplayOnLoad futurama-icon toggle-button toggle-camera-button toggle-camera-button-faceright" onclick="toggleSelfieCam()"></button>
+	<div id="toggle-camera-label">Switch Cam</div>
 
 	<button id="btn-change-overlay" class="noDisplayOnLoad futurama-icon toggle-button overlay-button" onclick="changeOverlay()"></button>
 	<img id="img-speech-bubble" class="noDisplayOnLoad" src="images/speech-bubble.png" alt="">
