@@ -26,7 +26,6 @@ if (cameraIsSupported) {
 	showElements(document.getElementById('camera-not-supported'));
 	setVisibilityForElements(noDisplayOnErrorElements, false);
 }
-setOverlay(OVERLAY.futurama);
 
 // Event Listeners
 window.addEventListener("orientationchange", checkScreenOrientation, false);
@@ -35,18 +34,18 @@ window.addEventListener('visibilitychange', checkScreenIsVisible, false);
 
 // Functions
 function checkScreenOrientation() {
-	const txtLandscapeNotSupported = document.getElementById('landscape-not-supported');
 	// Check for both left and right tilt
 	if (Math.abs(window.orientation) === 90) {
+		stopCameraStream();
 		setVisibilityForElements(noDisplayOnErrorElements, false);
-		showElements(txtLandscapeNotSupported);
+		showElements(document.getElementById('landscape-not-supported'));
 	} else if (cameraIsSupported) {
+		hideElements(document.getElementById('landscape-not-supported'));
 		if (isPhotoDisplayed) {
-			setVisibilityForElements(photoViewElements, true);
+			hideCameraView();
 		} else {
-			setVisibilityForElements(cameraViewElements, true);
+			showCameraView();
 		}
-		hideElements(txtLandscapeNotSupported);
 	}
 }
 
@@ -89,8 +88,8 @@ function downloadPhoto(){
 }
 
 function startCameraStream() {
-	const txtCameraNoPermission = document.getElementById('camera-no-permission');
-	hideElements(txtCameraNoPermission);
+	stopCameraStream();
+	hideElements(document.getElementById('camera-no-permission'));
 
 	// JS doesn't like using ternary to assign facingMode
 	let cameraType = "environment";
@@ -111,17 +110,16 @@ function startCameraStream() {
 			cameraView.srcObject = stream;
 			cameraX = stream.getVideoTracks()[0].getSettings().width;
 			cameraY = stream.getVideoTracks()[0].getSettings().height;
-			checkScreenOrientation();
 		}).catch(function(e) {
 			console.error('An error occurred trying to use camera stream', e);
-			showElements(txtCameraNoPermission);
+			showElements(document.getElementById('camera-no-permission'));
 			setVisibilityForElements(noDisplayOnErrorElements, false);
 			stopCameraStream();
 		});
 }
 
 function stopCameraStream() {
-	cameraView.srcObject.getVideoTracks().forEach(track => track.stop());
+	cameraView.srcObject?.getVideoTracks()?.forEach(track => track.stop());
 }
 
 function toggleSelfieCam() {
@@ -148,15 +146,14 @@ function changeOverlay() {
 }
 
 function setOverlay(overlay) {
-	const imgBackground = document.getElementById('img-background');
 	const headlessPlaceholder = document.getElementById('img-headless-placeholders');
 	headlessPlaceholder.style.display = "none";
 	switch (overlay) {
 		case OVERLAY.futurama:
-			imgBackground.src = "images/composite-futurama.png";
+			document.getElementById('img-background').src = "images/composite-futurama.png";
 			break;
 		case OVERLAY.headless:
-			imgBackground.src = "images/composite-headless.png";
+			document.getElementById('img-background').src = "images/composite-headless.png";
 			headlessPlaceholder.style.position = "fixed";
 			headlessPlaceholder.style.top = (cameraView.getBoundingClientRect().top + 20).toString();
 			headlessPlaceholder.style.left = (cameraView.getBoundingClientRect().left + 20).toString();
