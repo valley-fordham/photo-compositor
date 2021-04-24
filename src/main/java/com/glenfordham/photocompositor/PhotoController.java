@@ -23,7 +23,7 @@ public class PhotoController {
 	@PostMapping(value = "/saveimage")
 	public ResponseEntity<String> saveImage(@RequestBody byte[] image) {
 		try {
-			Files.write(Paths.get(PhotoCompositorApplication.getPhotoPath() + "//" + UUID.randomUUID() + "-" + LocalDateTime.now().toString().replace(":", "-")  + ".png"), image);
+			Files.write(Paths.get(PhotoCompositorApplication.getPhotoPath() + "//" + LocalDateTime.now().toString().replace(":", "-") + "_" + UUID.randomUUID()  + ".png"), image);
 			logger.info("Successful upload");
 		} catch (IOException e) {
 			logger.error("Error with upload attempt", e);
