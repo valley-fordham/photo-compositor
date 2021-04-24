@@ -1,5 +1,6 @@
 <head>
 	<title>Riot Photographer</title>
+	<meta charset="UTF-8">
 	<link rel="stylesheet" href="css/photo-compositor.css">
 
 	<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
@@ -35,6 +36,7 @@
 	<div class="vertical-spacer"></div>
 
 	<video id="camera" class="noDisplayOnLoad cameraView noDisplayOnError" width="480" height="640" autoplay preload="metadata" playsInline muted></video>
+	<img id="img-headless-placeholders" class="noDisplayOnLoad noDisplayOnError" src="images/composite-headless-placeholders.png" alt="">
 
 	<canvas id="canvas" class="noDisplayOnLoad photoView noDisplayOnError" width=480 height=640></canvas>
 

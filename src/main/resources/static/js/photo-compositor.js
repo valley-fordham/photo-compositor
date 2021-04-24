@@ -78,6 +78,7 @@ function showCameraView() {
 	hideElements(document.getElementById('txt-upload-success'));
 	setVisibilityForElements(photoViewElements, false);
 	setVisibilityForElements(cameraViewElements, true);
+	setOverlay(currentOverlay);
 	startCameraStream();
 }
 
@@ -148,12 +149,18 @@ function changeOverlay() {
 
 function setOverlay(overlay) {
 	const imgBackground = document.getElementById('img-background');
+	const headlessPlaceholder = document.getElementById('img-headless-placeholders');
+	headlessPlaceholder.style.display = "none";
 	switch (overlay) {
 		case OVERLAY.futurama:
-			imgBackground.src="images/composite-futurama.png";
+			imgBackground.src = "images/composite-futurama.png";
 			break;
 		case OVERLAY.headless:
-			imgBackground.src="images/composite-headless.png";
+			imgBackground.src = "images/composite-headless.png";
+			headlessPlaceholder.style.position = "fixed";
+			headlessPlaceholder.style.top = (cameraView.getBoundingClientRect().top + 20).toString();
+			headlessPlaceholder.style.left = (cameraView.getBoundingClientRect().left + 20).toString();
+			headlessPlaceholder.style.display = "block";
 			break;
 		default:
 			console.error('unsupported overlay');
@@ -169,6 +176,7 @@ function drawCompositeOverlay() {
 		case OVERLAY.headless:
 			const imgHeadless = document.getElementById('img-headless');
 			photoCanvas.getContext('2d').drawImage(imgHeadless, 0, 240, imgHeadless.width, imgHeadless.height);
+			document.getElementById('img-headless-placeholders').style.display = "none";
 	}
 	const photoTitle = document.getElementById('img-photo-title');
 	photoCanvas.getContext('2d').drawImage(photoTitle, 0, 20, photoTitle.width, photoTitle.height);
