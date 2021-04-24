@@ -1,5 +1,6 @@
 'use strict';
 
+// Initialise vars
 const noDisplayOnErrorElements = document.getElementsByClassName('noDisplayOnError');
 const cameraViewElements = document.getElementsByClassName('cameraView');
 const photoViewElements = document.getElementsByClassName('photoView');
@@ -16,7 +17,6 @@ let currentOverlay = OVERLAY.futurama;
 let selfieCam = true;
 let cameraX = 0;
 let cameraY = 0;
-let haveWarnedUserAboutChromeBug = false;
 
 // Initialise screen
 if (cameraIsSupported) {
@@ -28,11 +28,13 @@ if (cameraIsSupported) {
 }
 setOverlay(OVERLAY.futurama);
 
-window.addEventListener("orientationchange", function() {
-	checkOrientation();
-}, false);
+// Event Listeners
+window.addEventListener("orientationchange", checkScreenOrientation, false);
+window.addEventListener('visibilitychange', checkScreenIsVisible, false);
 
-function checkOrientation() {
+
+// Functions
+function checkScreenOrientation() {
 	const txtLandscapeNotSupported = document.getElementById('landscape-not-supported');
 	// Check for both left and right tilt
 	if (Math.abs(window.orientation) === 90) {
@@ -45,6 +47,14 @@ function checkOrientation() {
 			setVisibilityForElements(cameraViewElements, true);
 		}
 		hideElements(txtLandscapeNotSupported);
+	}
+}
+
+function checkScreenIsVisible() {
+	if (document.hidden) {
+		stopCameraStream();
+	} else {
+		startCameraStream();
 	}
 }
 
@@ -89,6 +99,7 @@ function startCameraStream() {
 	const constraints = {
 		video: {
 			facingMode: cameraType,
+			focusMode: "continuous"
 		},
 		audio: false
 	};
@@ -99,21 +110,16 @@ function startCameraStream() {
 			cameraView.srcObject = stream;
 			cameraX = stream.getVideoTracks()[0].getSettings().width;
 			cameraY = stream.getVideoTracks()[0].getSettings().height;
-			checkOrientation();
+			checkScreenOrientation();
 		}).catch(function(e) {
 			console.error('An error occurred trying to use camera stream', e);
 			showElements(txtCameraNoPermission);
 			setVisibilityForElements(noDisplayOnErrorElements, false);
-			haveWarnedUserAboutChromeBug = true;
 			stopCameraStream();
 		});
 }
 
 function stopCameraStream() {
-	if (isBrowserChrome() && !haveWarnedUserAboutChromeBug) {
-		haveWarnedUserAboutChromeBug = true;
-		alert("If Chrome appears to freeze at anytime, just minimise and reopen Chrome :)")
-	}
 	cameraView.srcObject.getVideoTracks().forEach(track => track.stop());
 }
 
@@ -128,9 +134,7 @@ function toggleSelfieCam() {
 		btnToggleCamera.classList.remove("toggle-camera-button-faceright");
 	}
 	stopCameraStream();
-	setTimeout(function() {
-		startCameraStream();
-	}, 500)
+	startCameraStream();
 }
 
 function changeOverlay() {
@@ -204,10 +208,6 @@ function showElements(/**/) {
 	for (let i = 0; i < arguments.length; i++) {
 		arguments[i].style.display = "block";
 	}
-}
-
-function isBrowserChrome() {
-	return /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
 }
 
 function setVisibilityForElements(elements, visible) {
