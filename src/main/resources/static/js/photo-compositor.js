@@ -74,7 +74,7 @@ function hideCameraView() {
 
 function showCameraView() {
 	isPhotoDisplayed = false;
-	hideElements(document.getElementById('txt-upload-success'));
+	hideElements(document.getElementById('txt-upload-success'), document.getElementById('txt-upload-unsuccess'));
 	setVisibilityForElements(photoViewElements, false);
 	setVisibilityForElements(cameraViewElements, true);
 	setOverlay(currentOverlay);
@@ -180,27 +180,44 @@ function drawCompositeOverlay() {
 }
 
 function uploadCompositePhoto() {
-	hideElements(document.getElementById('btn-upload'));
+	hideElements(document.getElementById('btn-upload'), document.getElementById('txt-upload-unsuccess'));
+	showElements(document.getElementById("txt-upload-inprogress"));
 	pushToServer(photoCanvasRaw, false);
 	pushToServer(photoCanvas, true);
 }
 
 function pushToServer(canvas, displayResponse) {
-	const xhr = new XMLHttpRequest();
 	canvas.toBlob(function(imageBlob) {
-		xhr.open('POST', "api/v1/saveimage", false);
+		const xhr = new XMLHttpRequest();
+		xhr.open('POST', "api/v1/saveimage");
 		xhr.setRequestHeader("Content-Type", "image/png");
+		xhr.timeout = 10000;
 		xhr.send(imageBlob);
-		if (displayResponse) {
-			if (xhr.status === 200) {
-				showElements(document.getElementById('txt-upload-success'));
-			} else {
-				alert("Upload failed :(");
-				console.error("Error uploading image:" + xhr.responseText);
-				showElements(document.getElementById('btn-upload'));
+		xhr.onload = function() {
+			if (displayResponse) {
+				if (xhr.status === 200) {
+					hideElements(document.getElementById("txt-upload-inprogress"));
+					showElements(document.getElementById('txt-upload-success'));
+				} else {
+					showUploadError(displayResponse);
+				}
 			}
 		}
+		xhr.onerror = function() {
+			showUploadError(xhr, displayResponse);
+		}
+		xhr.ontimeout = function() {
+			showUploadError(xhr, displayResponse);
+		}
 	})
+}
+
+function showUploadError(xhr, displayResponse) {
+	hideElements(document.getElementById("txt-upload-inprogress"));
+	if (displayResponse) {
+		console.error("Error uploading image:" + xhr.responseText);
+		showElements(document.getElementById('txt-upload-unsuccess'), document.getElementById('btn-upload'));
+	}
 }
 
 function hideElements(/**/) {
