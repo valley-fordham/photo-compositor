@@ -20,7 +20,7 @@ public class PhotoCompositorApplication {
 	public static void main(String[] args) {
 
 		Options options = new Options();
-		options.addRequiredOption("photopath", "p", true, "Path where uploaded photos should be saved");
+		options.addRequiredOption("p", "photopath", true, "Path where uploaded photos should be saved");
 		CommandLine cmd = null;
 		try {
 			cmd = new DefaultParser().parse(options, args, false);
