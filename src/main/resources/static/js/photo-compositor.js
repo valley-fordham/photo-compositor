@@ -199,7 +199,7 @@ function pushToServer(canvas, displayResponse) {
 					hideElements(document.getElementById("txt-upload-inprogress"));
 					showElements(document.getElementById('txt-upload-success'));
 				} else {
-					showUploadError(displayResponse);
+					showUploadError(xhr, true);
 				}
 			}
 		}
@@ -216,7 +216,7 @@ function showUploadError(xhr, displayResponse) {
 	hideElements(document.getElementById("txt-upload-inprogress"));
 	if (displayResponse) {
 		console.error("Error uploading image:" + xhr.responseText);
-		showElements(document.getElementById('txt-upload-unsuccess'), document.getElementById('btn-upload'));
+		showElements(document.getElementById('txt-upload-unsuccess'));
 	}
 }
 
