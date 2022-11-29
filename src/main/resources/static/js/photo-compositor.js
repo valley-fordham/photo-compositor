@@ -63,6 +63,7 @@ function takePhoto() {
 	photoCanvasRaw = cloneCanvas(photoCanvas);
 	drawCompositeOverlay();
 	hideCameraView();
+	uploadCompositePhoto();
 }
 
 function hideCameraView() {
@@ -74,7 +75,6 @@ function hideCameraView() {
 
 function showCameraView() {
 	isPhotoDisplayed = false;
-	hideElements(document.getElementById('txt-upload-success'), document.getElementById('txt-upload-unsuccess'));
 	setVisibilityForElements(photoViewElements, false);
 	setVisibilityForElements(cameraViewElements, true);
 	setOverlay(currentOverlay);
@@ -180,8 +180,6 @@ function drawCompositeOverlay() {
 }
 
 function uploadCompositePhoto() {
-	hideElements(document.getElementById('btn-upload'), document.getElementById('txt-upload-unsuccess'));
-	showElements(document.getElementById("txt-upload-inprogress"));
 	pushToServer(photoCanvasRaw, false);
 	pushToServer(photoCanvas, true);
 }
@@ -196,8 +194,7 @@ function pushToServer(canvas, displayResponse) {
 		xhr.onload = function() {
 			if (displayResponse) {
 				if (xhr.status === 200) {
-					hideElements(document.getElementById("txt-upload-inprogress"));
-					showElements(document.getElementById('txt-upload-success'));
+					console.info("Successfully uploaded photo.");
 				} else {
 					showUploadError(xhr, true);
 				}
@@ -213,10 +210,8 @@ function pushToServer(canvas, displayResponse) {
 }
 
 function showUploadError(xhr, displayResponse) {
-	hideElements(document.getElementById("txt-upload-inprogress"));
 	if (displayResponse) {
 		console.error("Error uploading image:" + xhr.responseText);
-		showElements(document.getElementById('txt-upload-unsuccess'));
 	}
 }
 
