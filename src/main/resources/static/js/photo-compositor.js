@@ -64,6 +64,7 @@ function checkScreenIsVisible() {
 }
 
 function takePhoto() {
+	hideElements(document.getElementById('txt-no-overlay'));
 	photoCanvas.getContext('2d').drawImage(cameraView, 0, 0, photoCanvas.width, photoCanvas.height);
 	// Make a copy of the raw photo for upload purposes
 	photoCanvasRaw = cloneCanvas(photoCanvas);
@@ -153,8 +154,10 @@ function changeOverlay() {
 }
 
 function setOverlay(overlay) {
+	hideElements(document.getElementById('txt-no-overlay'));
 	const headlessPlaceholder = document.getElementById('img-headless-placeholders');
 	headlessPlaceholder.style.display = "none";
+	document.getElementById('img-background').style.bottom = "0px"; // reset overlay preview position
 	switch (overlay) {
 		case OVERLAY.futurama:
 			document.getElementById('img-background').src = "images/composite-futurama.png";
@@ -168,9 +171,11 @@ function setOverlay(overlay) {
 			break;
 		case OVERLAY.ryanface:
 			document.getElementById('img-background').src = "images/composite-ryan-face-1.png";
+			document.getElementById('img-background').style.bottom = "100px"; // add some bottom padding to make this image nicer
 			break;
 		case OVERLAY.none:
 			document.getElementById('img-background').src = "";
+			showElements(document.getElementById('txt-no-overlay'));
 			break;
 		default:
 			console.error('unsupported overlay');

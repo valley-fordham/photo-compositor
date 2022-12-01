@@ -44,7 +44,7 @@
 
 	<button id="btn-capture" class="noDisplayOnLoad noDisplayOnError cameraView big-button" onclick="takePhoto()">Capture</button>
 
-	<button id="btn-download" class="noDisplayOnLoad noDisplayOnError photoView big-button" onclick="downloadPhoto()">Save to Phone</button>
+	<button id="btn-download" class="noDisplayOnLoad noDisplayOnError photoView big-button" onclick="downloadPhoto()">Download</button>
 	<button id="btn-retry" class="noDisplayOnLoad noDisplayOnError photoView big-button" onclick="showCameraView()">Retry</button>
 
 	<div id="txt-upload-success" class="text noDisplayOnLoad">
@@ -64,7 +64,13 @@
 	<img id="img-headless" class="noDisplayOnLoad" src="images/composite-headless.png" alt="">
 	<img id="img-photo-title" class="noDisplayOnLoad" src="images/composite-title.png" alt="">
 
-	<img id="img-background" class="cameraView" src="" alt="">
+	<div id="container-img-background">
+		<img id="img-background" class="cameraView" src="" alt="">
+		<div id="txt-no-overlay" class="text noDisplayOnLoad">
+			<div class="vertical-spacer"></div>
+			<span>Overlay Off</span>
+		</div>
+	</div>
 	<div class="copyright-notice">Copyright© 2022 Thread Assessment Corporation.</div>
 </div>
 
