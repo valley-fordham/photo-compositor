@@ -9,7 +9,13 @@ const cameraView = document.getElementById('camera');
 const photoCanvas = document.getElementById('canvas');
 let photoCanvasRaw;
 
-const OVERLAY = Object.freeze({"futurama": 0, "headless": 1});
+const OVERLAY = Object.freeze({
+		"futurama": 0,
+		"headless": 1,
+		"ryanface": 2,
+		"none": 3
+	}
+);
 
 const cameraIsSupported = 'mediaDevices' in navigator && 'getUserMedia' in navigator.mediaDevices;
 let isPhotoDisplayed = false;
@@ -75,14 +81,15 @@ function hideCameraView() {
 
 function showCameraView() {
 	isPhotoDisplayed = false;
+	hideElements(document.getElementById('txt-upload-success'));
 	setVisibilityForElements(photoViewElements, false);
 	setVisibilityForElements(cameraViewElements, true);
 	setOverlay(currentOverlay);
 	startCameraStream();
 }
 
-function downloadPhoto(){
-	photoCanvas.toBlob(function(blob) {
+function downloadPhoto() {
+	photoCanvas.toBlob(function (blob) {
 		saveAs(blob, "riot-" + new Date() + ".png");
 	});
 }
@@ -110,12 +117,12 @@ function startCameraStream() {
 			cameraView.srcObject = stream;
 			cameraX = stream.getVideoTracks()[0].getSettings().width;
 			cameraY = stream.getVideoTracks()[0].getSettings().height;
-		}).catch(function(e) {
-			console.error('An error occurred trying to use camera stream', e);
-			showElements(document.getElementById('camera-no-permission'));
-			setVisibilityForElements(noDisplayOnErrorElements, false);
-			stopCameraStream();
-		});
+		}).catch(function (e) {
+		console.error('An error occurred trying to use camera stream', e);
+		showElements(document.getElementById('camera-no-permission'));
+		setVisibilityForElements(noDisplayOnErrorElements, false);
+		stopCameraStream();
+	});
 }
 
 function stopCameraStream() {
@@ -139,7 +146,7 @@ function toggleSelfieCam() {
 function changeOverlay() {
 	currentOverlay++;
 	// Wrap Overlay when cycling between options
-	if (currentOverlay > OVERLAY.headless) {
+	if (currentOverlay > OVERLAY.none) {
 		currentOverlay = OVERLAY.futurama;
 	}
 	setOverlay(currentOverlay);
@@ -159,6 +166,12 @@ function setOverlay(overlay) {
 			headlessPlaceholder.style.left = (cameraView.getBoundingClientRect().left + 20).toString();
 			headlessPlaceholder.style.display = "block";
 			break;
+		case OVERLAY.ryanface:
+			document.getElementById('img-background').src = "images/composite-ryan-face-1.png";
+			break;
+		case OVERLAY.none:
+			document.getElementById('img-background').src = "";
+			break;
 		default:
 			console.error('unsupported overlay');
 	}
@@ -174,6 +187,12 @@ function drawCompositeOverlay() {
 			const imgHeadless = document.getElementById('img-headless');
 			photoCanvas.getContext('2d').drawImage(imgHeadless, 0, 240, imgHeadless.width, imgHeadless.height);
 			document.getElementById('img-headless-placeholders').style.display = "none";
+			break;
+		case OVERLAY.ryanface:
+			const imgRyanFace1 = document.getElementById('img-ryan-face-1');
+			const imgRyanFace2 = document.getElementById('img-ryan-face-2');
+			photoCanvas.getContext('2d').drawImage(imgRyanFace1, 10, 120, imgRyanFace1.width, imgRyanFace1.height);
+			photoCanvas.getContext('2d').drawImage(imgRyanFace2, 350, 510, imgRyanFace2.width, imgRyanFace2.height);
 	}
 	const photoTitle = document.getElementById('img-photo-title');
 	photoCanvas.getContext('2d').drawImage(photoTitle, 0, 20, photoTitle.width, photoTitle.height);
@@ -185,25 +204,26 @@ function uploadCompositePhoto() {
 }
 
 function pushToServer(canvas, displayResponse) {
-	canvas.toBlob(function(imageBlob) {
+	canvas.toBlob(function (imageBlob) {
 		const xhr = new XMLHttpRequest();
 		xhr.open('POST', "api/v1/saveimage");
 		xhr.setRequestHeader("Content-Type", "image/png");
 		xhr.timeout = 10000;
 		xhr.send(imageBlob);
-		xhr.onload = function() {
+		xhr.onload = function () {
 			if (displayResponse) {
 				if (xhr.status === 200) {
 					console.info("Successfully uploaded photo.");
+					showElements(document.getElementById('txt-upload-success'));
 				} else {
 					showUploadError(xhr, true);
 				}
 			}
 		}
-		xhr.onerror = function() {
+		xhr.onerror = function () {
 			showUploadError(xhr, displayResponse);
 		}
-		xhr.ontimeout = function() {
+		xhr.ontimeout = function () {
 			showUploadError(xhr, displayResponse);
 		}
 	})
